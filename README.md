@@ -1,176 +1,198 @@
-\# Polyhouse Sensor Project
+# Polyhouse Sensor Project
 
+## Objective
 
+This project processes polyhouse sensor data, performs data cleaning, and conducts exploratory data analysis (EDA) to understand relationships between environmental conditions and crop yield.
 
-\## Objective
+---
 
-Load polyhouse sensor CSV files, identify and handle missing values, and generate a cleaned dataset suitable for analysis and machine learning.
+## Project Structure
 
-
-
-\## Project Structure
-
-
-
-
-
+```
 polyhouse-sensor-project/
-
 │
-
 ├── data/
-
 │   ├── raw/
-
-│   │   ├── climate\_data.csv
-
-│   │   ├── polyhouse\_sensor.csv
-
-│   │   └── yield\_data.csv
-
+│   │   ├── climate_data.csv
+│   │   ├── polyhouse_sensor.csv
+│   │   └── yield_data.csv
 │   │
-
 │   └── processed/
-
-│       ├── 02\_cleaned.parquet
-
-│       └── sample\_cleaned\_data.csv
-
+│       ├── 01_combined.csv
+│       ├── 02_cleaned.parquet
+│       └── sample_cleaned_data.csv
 │
-
 ├── docs/
-
-│   └── cleaning\_log.md
-
+│   └── cleaning_log.md
 │
-
+├── reports/
+│   ├── data_quality.md
+│   ├── eda_summary.md
+│   └── figures/
+│       ├── correlation_heatmap.png
+│       ├── humidity_vs_yield.png
+│       ├── co2_vs_yield.png
+│       └── temperature_vs_yield.png
+│
 ├── src/
-
-│   ├── ingest\_data.py
-
-│   └── clean\_data.py
-
+│   ├── ingest_data.py
+│   ├── clean_data.py
+│   └── eda.py
 │
-
 └── README.md
+```
 
+---
 
+## Features
 
+### Task 2 – Data Cleaning
 
+- Loads raw sensor, climate, and yield datasets.
+- Audits missing values.
+- Cleans and preprocesses data.
+- Generates cleaned dataset in Parquet format.
+- Produces sample cleaned dataset.
+- Documents all cleaning decisions.
 
-\## Features
+### Task 3 – Exploratory Data Analysis (EDA)
 
+- Generates descriptive statistics.
+- Produces data quality report.
+- Creates correlation heatmap.
+- Creates scatter plots for:
+  - Humidity vs Yield
+  - CO₂ vs Yield
+  - Temperature vs Yield
+- Documents insights from environmental variables and crop yield.
 
+---
 
-\- Loads raw sensor and climate datasets.
+## Data Cleaning Strategy
 
-\- Audits missing values.
+- Temperature: Missing values imputed using median.
+- Humidity: Missing values imputed using median.
+- CO₂: Missing values imputed using median.
+- Yield: Rows with missing target values removed.
 
-\- Cleans and preprocesses data.
+Cleaning rationale is documented in:
 
-\- Generates cleaned output in Parquet format.
+```
+docs/cleaning_log.md
+```
 
-\- Produces a sample cleaned dataset.
+---
 
-\- Documents all cleaning decisions.
+## Data Quality Summary
 
+| Metric | Value |
+|----------|----------|
+| Total Observations | 50 |
+| Date Range | 2026-06-01 to 2026-06-05 |
+| Mean Temperature | 29.92 °C |
+| Mean Humidity | 62.72 % |
+| Mean CO₂ | 440.90 ppm |
+| Mean Yield | 124.00 kg |
 
+---
 
-\## Data Cleaning Strategy
+## Key EDA Insights
 
+### Humidity and Yield
 
+Humidity values range from 57% to 69%. Yield remains relatively stable across this range, indicating a moderate relationship between humidity and crop yield.
 
-\- Temperature: Missing values imputed using median.
+### CO₂ and Yield
 
-\- Humidity: Missing values imputed using median.
+Higher CO₂ levels generally correspond to slightly higher yield values, suggesting that increased CO₂ concentration may support plant growth inside the polyhouse environment.
 
-\- CO₂: Missing values imputed using median.
+### Temperature and Yield
 
-\- Yield: Rows with missing target values removed.
+Temperature remains within a narrow range (26.5°C–32.4°C). Yield variation is limited, indicating relatively stable growing conditions.
 
+### Correlation Notes
 
+- Correlation heatmap was generated to identify relationships among variables.
+- Correlation does not imply causation.
+- The dataset contains only 50 observations, so conclusions should be interpreted carefully.
 
-The cleaning rationale is documented in docs/cleaning\_log.md.
+---
 
+## Output Files
 
+### Cleaned Dataset
 
-\## Output Files
+```
+data/processed/02_cleaned.parquet
+```
 
+### Sample Dataset
 
+```
+data/processed/sample_cleaned_data.csv
+```
 
-\### Cleaned Dataset
+### Cleaning Log
 
+```
+docs/cleaning_log.md
+```
 
+### Data Quality Report
 
-data/processed/02\_cleaned.parquet
+```
+reports/data_quality.md
+```
 
+### EDA Summary
 
+```
+reports/eda_summary.md
+```
 
+### Figures
 
+```
+reports/figures/
+```
 
-\### Sample Dataset
+---
 
+## How to Run
 
+### Data Ingestion
 
-data/processed/sample\_cleaned\_data.csv
+```bash
+python src/ingest_data.py
+```
 
+### Data Cleaning
 
+```bash
+python src/clean_data.py
+```
 
+### Exploratory Data Analysis
 
+```bash
+python src/eda.py
+```
 
-\### Cleaning Log
+---
 
+## Technologies Used
 
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Seaborn
+- Parquet
+- Git
+- GitHub
 
-docs/cleaning\_log.md
+---
 
-
-
-
-
-\## How to Run
-
-
-
-\### Data Ingestion
-
-
-
-bash
-
-python src/ingest\_data.py
-
-
-
-
-
-\### Data Cleaning
-
-
-
-bash
-
-python src/clean\_data.py
-
-
-
-
-
-\## Technologies Used
-
-
-
-\- Python
-
-\- Pandas
-
-\- NumPy
-
-\- Parquet
-
-\- Git
-
-\- GitHub
 
 
 
