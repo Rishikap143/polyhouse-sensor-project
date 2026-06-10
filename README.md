@@ -125,6 +125,8 @@ Temperature remains within a narrow range. Yield variation is limited, indicatin
 
 ## Feature Engineering
 
+## Feature Engineering
+
 ### Engineered Feature
 
 ```text
@@ -150,10 +152,14 @@ yield
 
 ### Feature Validation
 
-* No missing values after feature engineering.
-* X and y shapes validated before processing.
-* Data sorted chronologically using timestamp.
-* Feature matrix successfully prepared for modeling.
+* No missing values detected after feature engineering.
+* Dataset sorted chronologically before train/test split.
+* Training set contains 400 observations.
+* Testing set contains 100 observations.
+* Feature matrix shape: (400, 4)
+* Target vector shape: (400,)
+* MinMaxScaler fitted using training data only.
+* Scaler saved successfully for future inference.
 
 ### Scaling
 
@@ -175,7 +181,50 @@ Result:
 
 ## Temporal Train/Test Split
 
-The dataset is sorted chronologically using the timestamp column before splitting.
+The dataset was sorted chronologically using the timestamp column before splitting.
+
+### Split Strategy
+
+* Training Set: First 80% of observations
+* Test Set: Last 20% of observations
+
+### Split Summary
+
+| Dataset | Rows | Start Date          | End Date            |
+| ------- | ---- | ------------------- | ------------------- |
+| Train   | 400  | 2025-01-01 06:00:00 | 2025-01-17 21:00:00 |
+| Test    | 100  | 2025-01-17 22:00:00 | 2025-01-22 01:00:00 |
+
+### Data Leakage Prevention
+
+The MinMaxScaler was fitted only on the training data.
+
+```python
+scaler.fit(X_train)
+```
+
+The same scaler was then applied to the test data.
+
+```python
+X_test_scaled = scaler.transform(X_test)
+```
+
+This prevents information from the test dataset leaking into the training process.
+
+### Saved Artifacts
+
+```text
+data/processed/X_train.parquet
+data/processed/X_test.parquet
+data/processed/y_train.parquet
+data/processed/y_test.parquet
+```
+
+### Saved Scaler
+
+```text
+models/scaler.joblib
+```
 
 ### Split Strategy
 

@@ -18,21 +18,24 @@ import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 import joblib
 
+# ==========================
 # Load cleaned dataset
+# ==========================
 df = pd.read_parquet("data/processed/02_cleaned.parquet")
 
-# Sort chronologically
-df = df.sort_values("timestamp")
-
-# Convert timestamp to datetime
+# Convert timestamp FIRST
 df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-# Feature engineering
+# Then sort chronologically
+df = df.sort_values("timestamp").reset_index(drop=True)
+
+# ==========================
+# Feature Engineering
+# ==========================
 df["temp_humid_interaction"] = (
     df["temperature"] * df["humidity"] / 100
 )
 
-# Feature columns
 feature_cols = [
     "temperature",
     "humidity",
@@ -40,97 +43,105 @@ feature_cols = [
     "temp_humid_interaction"
 ]
 
-# Temporal split (80% train, 20% test)
+# Debug: verify chronological order
+print("First timestamp:", df["timestamp"].iloc[0])
+print("Last timestamp:", df["timestamp"].iloc[-1])
+
+# ==========================
+# Temporal Train/Test Split
+# ==========================
 split_idx = int(len(df) * 0.8)
 
 train_df = df.iloc[:split_idx]
 test_df = df.iloc[split_idx:]
 
-print("Train rows:", len(train_df))
-print("Test rows:", len(test_df))
+print("\nTrain size:", len(train_df))
+print("Test size:", len(test_df))
 
-print(
-    "Train date range:",
-    train_df["timestamp"].min(),
-    "to",
-    train_df["timestamp"].max()
-)
+print("Train starts:", train_df["timestamp"].min())
+print("Train ends:", train_df["timestamp"].max())
 
-print(
-    "Test date range:",
-    test_df["timestamp"].min(),
-    "to",
-    test_df["timestamp"].max()
-)
+print("Test starts:", test_df["timestamp"].min())
+print("Test ends:", test_df["timestamp"].max())
 
+print("Chronological split complete")
+
+# ==========================
 # Create X and y
+# ==========================
 X_train = train_df[feature_cols]
 X_test = test_df[feature_cols]
 
 y_train = train_df["yield"]
 y_test = test_df["yield"]
 
-# Validate shapes
-print("X_train shape:", X_train.shape)
-print("X_test shape:", X_test.shape)
+# ==========================
+# Missing Value Check
+# ==========================
+print("\nFeature Columns:")
+print(X_train.columns)
 
-print("y_train shape:", y_train.shape)
-print("y_test shape:", y_test.shape)
+print("\nMissing Values:")
+print(X_train.isnull().sum())
 
-# Check for missing values
-assert X_train.isna().sum().sum() == 0, "X_train contains NaN values"
-assert X_test.isna().sum().sum() == 0, "X_test contains NaN values"
+assert X_train.isna().sum().sum() == 0
+assert X_test.isna().sum().sum() == 0
+assert y_train.isna().sum() == 0
+assert y_test.isna().sum() == 0
 
-assert y_train.isna().sum() == 0, "y_train contains NaN values"
-assert y_test.isna().sum() == 0, "y_test contains NaN values"
-
-print("No NaN values found")
-
-# Create models folder if missing
+# ==========================
+# Scaling (TRAIN ONLY)
+# ==========================
 Path("models").mkdir(exist_ok=True)
 
-# Scale features using TRAIN ONLY
 scaler = MinMaxScaler()
 
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-print("Minimum scaled value:", X_train_scaled.min())
-print("Maximum scaled value:", X_train_scaled.max())
+print("\nMinimum Values After Scaling:")
+print(pd.Series(X_train_scaled.min(axis=0), index=feature_cols))
 
+print("\nMaximum Values After Scaling:")
+print(pd.Series(X_train_scaled.max(axis=0), index=feature_cols))
+
+print("\nX shape:", X_train.shape)
+print("y shape:", y_train.shape)
+
+# ==========================
 # Save scaler
-joblib.dump(
-    scaler,
-    "models/scaler.joblib"
-)
+# ==========================
+joblib.dump(scaler, "models/scaler.joblib")
 
-print("Scaler saved successfully")
+print("\nScaler saved successfully")
 
-# Save train features
+# ==========================
+# Save train/test features
+# ==========================
 pd.DataFrame(
     X_train_scaled,
-    columns=[c + "_scaled" for c in feature_cols]
+    columns=feature_cols
 ).to_parquet(
     "data/processed/X_train.parquet",
     index=False
 )
 
-# Save test features
 pd.DataFrame(
     X_test_scaled,
-    columns=[c + "_scaled" for c in feature_cols]
+    columns=feature_cols
 ).to_parquet(
     "data/processed/X_test.parquet",
     index=False
 )
 
-# Save train target
+# ==========================
+# Save targets
+# ==========================
 y_train.to_frame().to_parquet(
     "data/processed/y_train.parquet",
     index=False
 )
 
-# Save test target
 y_test.to_frame().to_parquet(
     "data/processed/y_test.parquet",
     index=False
