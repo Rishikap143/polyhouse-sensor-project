@@ -2,15 +2,25 @@
 
 ## Objective
 
+<<<<<<< HEAD
 This project processes polyhouse sensor data, performs data cleaning, exploratory data analysis (EDA), and feature engineering to prepare data for crop yield prediction using machine learning.
+=======
+This project processes polyhouse sensor data, performs data cleaning, and conducts exploratory data analysis (EDA) to understand relationships between environmental conditions and crop yield.
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 
 ---
 
 ## Project Structure
 
+<<<<<<< HEAD
 ```text
 polyhouse-sensor-project/
 
+=======
+```
+polyhouse-sensor-project/
+│
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 ├── data/
 │   ├── raw/
 │   │   ├── climate_data.csv
@@ -20,18 +30,25 @@ polyhouse-sensor-project/
 │   └── processed/
 │       ├── 01_combined.csv
 │       ├── 02_cleaned.parquet
+<<<<<<< HEAD
 │       ├── sample_cleaned_data.csv
 │       ├── X_train.parquet
 │       ├── X_test.parquet
 │       ├── y_train.parquet
 │       └── y_test.parquet
+=======
+│       └── sample_cleaned_data.csv
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 │
 ├── docs/
 │   └── cleaning_log.md
 │
+<<<<<<< HEAD
 ├── models/
 │   └── scaler.joblib
 │
+=======
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 ├── reports/
 │   ├── data_quality.md
 │   ├── eda_summary.md
@@ -44,8 +61,12 @@ polyhouse-sensor-project/
 ├── src/
 │   ├── ingest_data.py
 │   ├── clean_data.py
+<<<<<<< HEAD
 │   ├── eda.py
 │   └── features.py
+=======
+│   └── eda.py
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 │
 └── README.md
 ```
@@ -56,6 +77,7 @@ polyhouse-sensor-project/
 
 ### Task 2 – Data Cleaning
 
+<<<<<<< HEAD
 * Loads raw sensor, climate, and yield datasets.
 * Audits missing values.
 * Cleans and preprocesses data.
@@ -83,11 +105,31 @@ polyhouse-sensor-project/
 * Applies MinMaxScaler using training data only.
 * Saves scaler for future model inference.
 * Saves train/test artifacts for model training.
+=======
+- Loads raw sensor, climate, and yield datasets.
+- Audits missing values.
+- Cleans and preprocesses data.
+- Generates cleaned dataset in Parquet format.
+- Produces sample cleaned dataset.
+- Documents all cleaning decisions.
+
+### Task 3 – Exploratory Data Analysis (EDA)
+
+- Generates descriptive statistics.
+- Produces data quality report.
+- Creates correlation heatmap.
+- Creates scatter plots for:
+  - Humidity vs Yield
+  - CO₂ vs Yield
+  - Temperature vs Yield
+- Documents insights from environmental variables and crop yield.
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 
 ---
 
 ## Data Cleaning Strategy
 
+<<<<<<< HEAD
 * Temperature: Missing values imputed using median.
 * Humidity: Missing values imputed using median.
 * CO₂: Missing values imputed using median.
@@ -96,11 +138,37 @@ polyhouse-sensor-project/
 Cleaning rationale is documented in:
 
 ```text
+=======
+- Temperature: Missing values imputed using median.
+- Humidity: Missing values imputed using median.
+- CO₂: Missing values imputed using median.
+- Yield: Rows with missing target values removed.
+
+Cleaning rationale is documented in:
+
+```
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 docs/cleaning_log.md
 ```
 
 ---
 
+<<<<<<< HEAD
+=======
+## Data Quality Summary
+
+| Metric | Value |
+|----------|----------|
+| Total Observations | 50 |
+| Date Range | 2026-06-01 to 2026-06-05 |
+| Mean Temperature | 29.92 °C |
+| Mean Humidity | 62.72 % |
+| Mean CO₂ | 440.90 ppm |
+| Mean Yield | 124.00 kg |
+
+---
+
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 ## Key EDA Insights
 
 ### Humidity and Yield
@@ -113,6 +181,7 @@ Higher CO₂ levels generally correspond to slightly higher yield values, sugges
 
 ### Temperature and Yield
 
+<<<<<<< HEAD
 Temperature remains within a narrow range. Yield variation is limited, indicating relatively stable growing conditions.
 
 ### Correlation Notes
@@ -261,6 +330,14 @@ data/processed/y_test.parquet
 ```text
 models/scaler.joblib
 ```
+=======
+Temperature remains within a narrow range (26.5°C–32.4°C). Yield variation is limited, indicating relatively stable growing conditions.
+
+### Correlation Notes
+
+- Correlation heatmap was generated to identify relationships among variables.
+- Correlation does not imply causation.
+- The dataset contains only 50 observations, so conclusions should be interpreted carefully.
 
 ---
 
@@ -268,6 +345,7 @@ models/scaler.joblib
 
 ### Cleaned Dataset
 
+<<<<<<< HEAD
 ```text
 data/processed/02_cleaned.parquet
 ```
@@ -300,24 +378,51 @@ data/processed/y_test.parquet
 
 ```text
 models/scaler.joblib
+=======
+```
+data/processed/02_cleaned.parquet
+```
+
+### Sample Dataset
+
+```
+data/processed/sample_cleaned_data.csv
+>>>>>>> 7f05e11df5fcc7592a22e75b856967e373f5725a
 ```
 
 ### Cleaning Log
 
+<<<<<<< HEAD
 ```text
+=======
 docs/cleaning_log.md
 ```
 
 ### Data Quality Report
 
+<<<<<<< HEAD
 ```text
+=======
+```
 reports/data_quality.md
 ```
 
 ### EDA Summary
 
+<<<<<<< HEAD
 ```text
 reports/eda_summary.md
+```
+
+=======
+```
+reports/eda_summary.md
+```
+
+### Figures
+
+```
+reports/figures/
 ```
 
 ---
@@ -342,16 +447,19 @@ python src/clean_data.py
 python src/eda.py
 ```
 
+<<<<<<< HEAD
 ### Feature Engineering
 
 ```bash
 python src/features.py
 ```
 
+=======
 ---
 
 ## Technologies Used
 
+<<<<<<< HEAD
 * Python
 * Pandas
 * NumPy
@@ -361,6 +469,18 @@ python src/features.py
 * Parquet
 * Git
 * GitHub
+
+=======
+- Python
+- Pandas
+- NumPy
+- Matplotlib
+- Seaborn
+- Parquet
+- Git
+- GitHub
+
+---
 
 
 
