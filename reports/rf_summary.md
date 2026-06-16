@@ -1,53 +1,51 @@
-# Task 6: Random Forest & Time-Series Cross Validation
 
-## Random Forest Test Results
+# Random Forest Tuning Summary
 
-* Train MAE: 0.028 kg
-* Test MAE: 0.053 kg
-* Test R²: 0.532
+## Parameter Grid
 
-## TimeSeriesSplit Cross Validation
+- n_estimators: [50, 100, 200]
+- max_depth: [None, 8, 16]
+- min_samples_leaf: [1, 3, 5]
+## Parameter Grid Rationale
 
-### Random Forest
+- n_estimators controls the number of trees in the forest. Higher values can improve stability but increase training time.
 
-* Fold MAE Scores:
+- max_depth controls how deep each tree can grow. Limiting depth helps reduce overfitting.
 
-  * 0.158
-  * 0.021
-  * 0.129
-  * 0.123
-  * 0.093
+- min_samples_leaf controls the minimum samples required in a leaf node. Larger values create smoother predictions and reduce overfitting.
 
-* Mean CV MAE: 0.105
+## Best Parameters
 
-* Std CV MAE: 0.047
+{'max_depth': 8, 'min_samples_leaf': 1, 'n_estimators': 100}
 
-### Linear Regression
+## Best CV MAE
 
-* Fold MAE Scores:
+-0.1047
 
-  * 0.137
-  * 0.126
-  * 0.109
-  * 0.122
-  * 0.092
+## Test Metrics
 
-* Mean CV MAE: 0.117
-
-* Std CV MAE: 0.016
-
-## Feature Importance Interpretation
-
-The Random Forest model was trained using temperature, humidity, and CO₂ features. The feature importance chart indicates which environmental factors contribute most strongly to yield prediction. Features with higher importance values have a greater influence on the model's decisions.
-
-## Overfitting Analysis
-
-Train MAE (0.028 kg) is close to Test MAE (0.053 kg), indicating that the model generalizes well and does not exhibit significant overfitting.
+- MAE: 0.0535
+- RMSE: 0.0940
+- R²: 0.5307
 
 ## Model Comparison
 
-Random Forest achieved a lower average CV MAE (0.105) than Linear Regression (0.117), suggesting slightly better predictive performance. However, Random Forest also showed higher variance across folds, indicating less stable performance over time.
+| Model | MAE | RMSE | R² |
+|--------|--------|--------|--------|
+| Linear Regression | 0.0704 | 0.0995 | 0.8015 |
+| Random Forest Default | 0.0800 | 0.1100 | 0.4700 |
+| Random Forest Tuned | 0.0535 | 0.0940 | 0.5307 |
 
-## Conclusion
+## Champion Model
 
-Random Forest provides a modest improvement in prediction accuracy compared with Linear Regression. The additional complexity is justified when predictive performance is the primary objective, while Linear Regression remains more interpretable.
+## Champion Model
+The Tuned Random Forest model was selected as the champion model because it achieved the lowest MAE and RMSE on the untouched test set. Although Linear Regression achieved a higher R² score, the tuned Random Forest produced smaller prediction errors, making it the preferred model for yield prediction.
+## Runtime
+
+Training and tuning completed in 19.55 seconds.
+
+## Limitations
+
+- Predictions may be less reliable when sensor values fall outside the training range.
+- Seasonal effects are not explicitly modeled.
+- Additional environmental variables may improve prediction accuracy.

@@ -1,26 +1,34 @@
-# Polyhouse Sensor Project
+# Polyhouse Mushroom Yield Forecasting
 
-## Objective
+## Overview
 
-This project processes polyhouse sensor data, performs data cleaning, exploratory data analysis (EDA), feature engineering, and machine learning modeling to prepare data for crop yield prediction.
+This project predicts mushroom yield (kg) using environmental sensor data collected from a polyhouse.
+
+The workflow includes:
+
+* Data ingestion
+* Data cleaning
+* Exploratory Data Analysis (EDA)
+* Feature engineering
+* Linear Regression baseline model
+* Random Forest model
+* Hyperparameter tuning using GridSearchCV
+* Champion model selection
+* Yield prediction inference
 
 ---
 
 ## Project Structure
 
 ```text
-polyhouse-sensor-project/
+polyhouse-sensor-project-master/
 
 ├── data/
 │   ├── raw/
-│   │   ├── climate_data.csv
-│   │   ├── polyhouse_sensor.csv
-│   │   └── yield_data.csv
-│   │
 │   └── processed/
 │       ├── 01_combined.csv
 │       ├── 02_cleaned.parquet
-│       ├── sample_cleaned_data.csv
+│       ├── features.parquet
 │       ├── X_train.parquet
 │       ├── X_test.parquet
 │       ├── y_train.parquet
@@ -30,331 +38,203 @@ polyhouse-sensor-project/
 │   └── cleaning_log.md
 │
 ├── models/
-│   └── scaler.joblib
+│   ├── champion.joblib
+│   ├── random_forest.joblib
+│   ├── linear_regression.joblib
+│   ├── scaler.joblib
+│   ├── minmax_scaler.joblib
+│   ├── feature_cols.json
+│   └── rf_best_params.json
 │
 ├── reports/
-│   ├── data_quality.md
+│   ├── figures/
+│   │   ├── correlation_heatmap.png
+│   │   ├── temperature_vs_yield.png
+│   │   ├── humidity_vs_yield.png
+│   │   ├── co2_vs_yield.png
+│   │   ├── pred_vs_actual.png
+│   │   ├── residuals_linear.png
+│   │   └── rf_importance.png
+│   │
 │   ├── eda_summary.md
-│   ├── linear_metrics.json
-│   └── figures/
-│       ├── correlation_heatmap.png
-│       ├── humidity_vs_yield.png
-│       ├── co2_vs_yield.png
-│       ├── temperature_vs_yield.png
-│       └── rf_feature_importance.png
+│   ├── data_quality.md
+│   ├── linear_diagnostics.md
+│   ├── rf_summary.md
+│   ├── metrics_linear.json
+│   ├── rf_tuned_metrics.json
+│   └── model_comparison.csv
 │
 ├── src/
 │   ├── ingest_data.py
 │   ├── clean_data.py
-│   ├── eda.py
 │   ├── features.py
-│   ├── train_linear.py
-│   └── train_random_forest.py
+│   ├── eda.py
+│   ├── predict.py
+│   └── train_rf_tuned.py
 │
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## Features
+## Installation
 
-### Task 2 – Data Cleaning
-
-* Loads raw sensor, climate, and yield datasets.
-* Audits missing values.
-* Cleans and preprocesses data.
-* Generates cleaned dataset in Parquet format.
-* Produces sample cleaned dataset.
-* Documents all cleaning decisions.
-
-### Task 3 – Exploratory Data Analysis (EDA)
-
-* Generates descriptive statistics.
-* Produces data quality report.
-* Creates correlation heatmap.
-* Creates scatter plots for:
-
-  * Humidity vs Yield
-  * CO₂ vs Yield
-  * Temperature vs Yield
-* Documents insights from environmental variables and crop yield.
-
-### Task 4 – Feature Engineering
-
-* Creates machine learning features from cleaned data.
-* Engineers interaction feature between temperature and humidity.
-* Performs chronological train/test split.
-* Applies MinMaxScaler using training data only.
-* Saves scaler for future model inference.
-* Saves train/test artifacts for model training.
-
-### Task 5 – Linear Regression Baseline
-
-* Trains an interpretable Linear Regression model.
-* Evaluates MAE, RMSE, and R² on the test dataset.
-* Generates residual diagnostics.
-* Produces coefficient interpretation for agritech applications.
-* Saves evaluation metrics.
-
-### Task 6 – Random Forest & Time-Series Cross Validation
-
-* Trains a Random Forest Regressor.
-* Uses TimeSeriesSplit cross-validation.
-* Computes cross-validation MAE scores.
-* Generates feature importance visualization.
-* Compares performance against the Linear Regression baseline.
-* Performs overfitting analysis using train and test metrics.
-
----
-
-## Data Cleaning Strategy
-
-* Temperature: Missing values imputed using median.
-* Humidity: Missing values imputed using median.
-* CO₂: Missing values imputed using median.
-* Yield: Rows with missing target values removed.
-
-Cleaning rationale is documented in:
-
-```text
-docs/cleaning_log.md
-```
-
----
-
-## Key EDA Insights
-
-### Humidity and Yield
-
-Humidity values remain relatively stable throughout the dataset. Yield variation appears moderate across humidity levels.
-
-### CO₂ and Yield
-
-Higher CO₂ concentrations are generally associated with slightly increased yield values, suggesting a positive relationship.
-
-### Temperature and Yield
-
-Temperature remains within a relatively narrow range, indicating stable growing conditions.
-
-### Correlation Notes
-
-* Correlation heatmap was generated to identify relationships among variables.
-* Correlation does not imply causation.
-* Results should be interpreted carefully because of dataset size.
-
----
-
-## Feature Engineering
-
-### Engineered Feature
-
-```text
-temp_humid_interaction = (temperature × humidity) / 100
-```
-
-### Feature Columns
-
-| Feature                | Description                      |
-| ---------------------- | -------------------------------- |
-| temperature            | Greenhouse temperature reading   |
-| humidity               | Greenhouse humidity reading      |
-| co2                    | Carbon dioxide concentration     |
-| temp_humid_interaction | Temperature–humidity interaction |
-
-### Target Variable
-
-```text
-yield
-```
-
-### Scaling
-
-MinMaxScaler is used to normalize feature values.
-
-```text
-X_scaled = (X - X_min) / (X_max - X_min)
-```
-
----
-
-## Temporal Train/Test Split
-
-The dataset was sorted chronologically before splitting.
-
-### Split Strategy
-
-* Training Set: First 80% of observations
-* Test Set: Last 20% of observations
-
-### Data Leakage Prevention
-
-The MinMaxScaler was fitted only on the training dataset and then applied to the test dataset.
-
-This prevents information leakage from the test set into the training process.
-
----
-
-## Task 5 – Linear Regression Baseline
-
-### Test Metrics
-
-| Metric | Value   |
-| ------ | ------- |
-| MAE    | 0.07 kg |
-| RMSE   | 0.10 kg |
-| R²     | 0.802   |
-
-### Model Interpretation
-
-The Linear Regression model provides an interpretable baseline for mushroom yield prediction.
-
-Feature coefficients indicate the direction and strength of influence of environmental variables on yield.
-
-### Residual Analysis
-
-Residual plots were generated to assess prediction errors and model assumptions.
-
----
-
-## Task 6 – Random Forest & Time-Series Cross Validation
-
-### Cross-Validation Strategy
-
-TimeSeriesSplit was used to preserve temporal ordering and prevent future observations from influencing past predictions.
-
-### Feature Importance
-
-A feature importance chart was generated and saved as:
-
-```text
-reports/rf_feature_importance.png
-```
-
-### Cross-Validation Results
-
-| Fold | MAE           |
-| ---- | ------------- |
-| 1    | To be updated |
-| 2    | To be updated |
-| 3    | To be updated |
-| 4    | To be updated |
-| 5    | To be updated |
-
-**Mean CV MAE:** To be updated after training.
-
-### Overfitting Analysis
-
-| Metric | Training Set  | Test Set      |
-| ------ | ------------- | ------------- |
-| MAE    | To be updated | To be updated |
-| RMSE   | To be updated | To be updated |
-
-Interpretation:
-
-* Small train–test gap indicates good generalization.
-* Large train–test gap suggests overfitting.
-
-### Comparison with Linear Regression
-
-| Model             | MAE           | RMSE          | R²            |
-| ----------------- | ------------- | ------------- | ------------- |
-| Linear Regression | 0.07          | 0.10          | 0.802         |
-| Random Forest     | To be updated | To be updated | To be updated |
-
-### Complexity Assessment
-
-Random Forest can capture non-linear relationships between environmental variables and yield.
-
-Whether the additional complexity is justified depends on the improvement observed relative to the Linear Regression baseline.
-
----
-
-## Output Files
-
-### Cleaned Dataset
-
-```text
-data/processed/02_cleaned.parquet
-```
-
-### Sample Dataset
-
-```text
-data/processed/sample_cleaned_data.csv
-```
-
-### Training Artifacts
-
-```text
-data/processed/X_train.parquet
-data/processed/X_test.parquet
-data/processed/y_train.parquet
-data/processed/y_test.parquet
-models/scaler.joblib
-```
-
-### Reports
-
-```text
-reports/data_quality.md
-reports/eda_summary.md
-reports/linear_metrics.json
-reports/rf_feature_importance.png
-```
-
----
-
-## How to Run
-
-### Data Ingestion
+Create a virtual environment:
 
 ```bash
+python -m venv venv
+```
+
+Activate it:
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Training the Model
+
+Run the Random Forest tuning pipeline:
+
+```bash
+python src/train_rf_tuned.py
+```
+
+Outputs:
+
+* Tuned Random Forest model
+* Champion model
+* Best hyperparameters
+* Evaluation metrics
+* Comparison report
+* Predicted vs Actual plot
+
+---
+
+## Hyperparameter Tuning
+
+GridSearchCV was performed using the following parameter grid:
+
+```python
+{
+    "n_estimators": [50, 100, 200],
+    "max_depth": [None, 8, 16],
+    "min_samples_leaf": [1, 3, 5]
+}
+```
+
+Best Parameters:
+
+```json
+{
+    "max_depth": 8,
+    "min_samples_leaf": 1,
+    "n_estimators": 200
+}
+```
+
+---
+
+## Model Performance
+
+| Model                 | MAE    | RMSE   | R²     |
+| --------------------- | ------ | ------ | ------ |
+| Linear Regression     | 0.0704 | 0.0995 | 0.8015 |
+| Random Forest Default | 0.0800 | 0.1100 | 0.4700 |
+| Random Forest Tuned   | 0.0536 | 0.0942 | 0.5288 |
+
+---
+
+## Champion Model
+
+Champion Model:
+
+**Tuned Random Forest Regressor**
+
+Reason:
+
+The tuned Random Forest achieved the lowest MAE and RMSE on the untouched test set, providing the most accurate yield predictions.
+
+Saved as:
+
+```text
+models/champion.joblib
+```
+
+---
+
+## Running Inference
+
+Example:
+
+```python
+from src.predict import predict_yield
+
+yield_prediction = predict_yield(
+    temperature_c=24.5,
+    humidity_pct=85.0,
+    co2_ppm=900
+)
+
+print(f"Predicted Yield: {yield_prediction:.2f} kg")
+```
+
+Example Output:
+
+```text
+Predicted Yield: 3.42 kg
+```
+
+---
+
+## Generated Reports
+
+The project automatically creates:
+
+* Correlation heatmap
+* Feature relationship plots
+* Feature importance plot
+* Residual analysis
+* Predicted vs Actual plot
+* EDA summary
+* Model comparison report
+
+All reports are stored in:
+
+```text
+reports/
+```
+
+---
+
+## Limitations
+
+* Predictions may be less reliable when sensor values fall outside the training range.
+* Seasonal effects are not explicitly modeled.
+* Additional environmental variables may improve prediction accuracy.
+* Performance depends on the quality of sensor measurements.
+
+---
+
+## Reproducibility
+
+To reproduce the entire workflow:
+
+```bash
+pip install -r requirements.txt
 python src/ingest_data.py
-```
-
-### Data Cleaning
-
-```bash
 python src/clean_data.py
-```
-
-### Exploratory Data Analysis
-
-```bash
-python src/eda.py
-```
-
-### Feature Engineering
-
-```bash
 python src/features.py
+python src/eda.py
+python src/train_rf_tuned.py
 ```
-
-### Linear Regression
-
-```bash
-python src/train_linear.py
-```
-
-### Random Forest
-
-```bash
-python src/train_random_forest.py
-```
-
----
-
-## Technologies Used
-
-* Python
-* Pandas
-* NumPy
-* Matplotlib
-* Scikit-learn
-* Joblib
-* Parquet
-* Git
-* GitHub
-
-
-
