@@ -6,17 +6,25 @@ from pathlib import Path
 
 MODEL_DIR = Path("models")
 
+
 @st.cache_resource
 def load_artifacts():
-    model = joblib.load(
-        MODEL_DIR / "champion.joblib"
-    )
+    try:
+        model = joblib.load(
+            MODEL_DIR / "champion.joblib"
+        )
 
-    feature_cols = json.loads(
-        (MODEL_DIR / "feature_cols.json").read_text()
-    )
+        feature_cols = json.loads(
+            (MODEL_DIR / "feature_cols.json").read_text()
+        )
 
-    return model, feature_cols
+        return model, feature_cols
+
+    except FileNotFoundError:
+        st.error(
+            "❌ Model files not found. Please ensure champion.joblib and feature_cols.json exist in the models folder."
+        )
+        st.stop()
 
 
 def predict_yield(

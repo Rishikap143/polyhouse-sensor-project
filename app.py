@@ -1,7 +1,36 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+from datetime import datetime
+from pathlib import Path
 from src.predict import predict_yield
+
+
+# Prediction logging
+def log_prediction(temp, humidity, co2, prediction):
+    log_file = "prediction_log.csv"
+
+    row = pd.DataFrame([{
+        "timestamp": datetime.now(),
+        "temperature": temp,
+        "humidity": humidity,
+        "co2": co2,
+        "prediction": prediction
+    }])
+
+    if Path(log_file).exists():
+        row.to_csv(
+            log_file,
+            mode="a",
+            header=False,
+            index=False
+        )
+    else:
+        row.to_csv(
+            log_file,
+            index=False
+        )
+
 
 # Page setup
 st.set_page_config(
@@ -53,12 +82,28 @@ if co2 > 1800:
 
 # Prediction
 if st.button("Predict Yield"):
-    kg = predict_yield(temp, humid, co2)
+
+    with st.spinner("Generating prediction..."):
+
+        kg = predict_yield(
+            temp,
+            humid,
+            co2
+        )
+
+        log_prediction(
+            temp,
+            humid,
+            co2,
+            kg
+        )
 
     st.metric(
         label="Estimated Daily Yield",
         value=f"{kg:.2f} kg"
     )
+
+    st.success("✅ Prediction logged successfully")
 
 # Sensitivity Chart
 st.subheader("What-if Analysis: Humidity Sweep")
