@@ -1,10 +1,17 @@
 # Polyhouse Mushroom Yield Forecasting
 
+## Live Deployment
+
+**Streamlit App:**
+https://polyhouse-yield-predictor.streamlit.app
+
+This application predicts mushroom yield (kg) using environmental sensor readings collected from a polyhouse.
+
+---
+
 ## Overview
 
-This project predicts mushroom yield (kg) using environmental sensor data collected from a polyhouse.
-
-The workflow includes:
+The project implements an end-to-end machine learning workflow for mushroom yield prediction:
 
 * Data ingestion
 * Data cleaning
@@ -14,6 +21,7 @@ The workflow includes:
 * Random Forest model
 * Hyperparameter tuning using GridSearchCV
 * Champion model selection
+* Streamlit deployment
 * Yield prediction inference
 
 ---
@@ -23,39 +31,25 @@ The workflow includes:
 ```text
 polyhouse-sensor-project-master/
 
+├── app.py
 ├── data/
 │   ├── raw/
 │   └── processed/
-│       ├── 01_combined.csv
-│       ├── 02_cleaned.parquet
-│       ├── features.parquet
-│       ├── X_train.parquet
-│       ├── X_test.parquet
-│       ├── y_train.parquet
-│       └── y_test.parquet
 │
 ├── docs/
-│   └── cleaning_log.md
+│   ├── cleaning_log.md
+│   └── monitoring.md
 │
 ├── models/
 │   ├── champion.joblib
+│   ├── feature_cols.json
 │   ├── random_forest.joblib
 │   ├── linear_regression.joblib
 │   ├── scaler.joblib
-│   ├── minmax_scaler.joblib
-│   ├── feature_cols.json
 │   └── rf_best_params.json
 │
 ├── reports/
 │   ├── figures/
-│   │   ├── correlation_heatmap.png
-│   │   ├── temperature_vs_yield.png
-│   │   ├── humidity_vs_yield.png
-│   │   ├── co2_vs_yield.png
-│   │   ├── pred_vs_actual.png
-│   │   ├── residuals_linear.png
-│   │   └── rf_importance.png
-│   │
 │   ├── eda_summary.md
 │   ├── data_quality.md
 │   ├── linear_diagnostics.md
@@ -73,6 +67,7 @@ polyhouse-sensor-project-master/
 │   └── train_rf_tuned.py
 │
 ├── requirements.txt
+├── .runtime.txt
 └── README.md
 ```
 
@@ -123,7 +118,7 @@ Outputs:
 
 ## Hyperparameter Tuning
 
-GridSearchCV was performed using the following parameter grid:
+GridSearchCV parameter grid:
 
 ```python
 {
@@ -157,18 +152,17 @@ Best Parameters:
 
 ## Champion Model
 
-Champion Model:
-
 **Tuned Random Forest Regressor**
 
 Reason:
 
-The tuned Random Forest achieved the lowest MAE and RMSE on the untouched test set, providing the most accurate yield predictions.
+The tuned Random Forest achieved the lowest MAE and RMSE on the untouched test set and was selected as the production model.
 
-Saved as:
+Saved artifacts:
 
 ```text
 models/champion.joblib
+models/feature_cols.json
 ```
 
 ---
@@ -197,9 +191,85 @@ Predicted Yield: 3.42 kg
 
 ---
 
+## Running the Streamlit App
+
+Run locally:
+
+```bash
+streamlit run app.py
+```
+
+Open:
+
+```text
+http://localhost:8501
+```
+
+---
+
+## Cloud Deployment
+
+The application is deployed on Streamlit Community Cloud:
+
+https://polyhouse-yield-predictor.streamlit.app
+
+Deployment requirements:
+
+* Streamlit
+* Pandas
+* NumPy
+* Scikit-learn
+* Matplotlib
+* Joblib
+
+Python version is pinned using:
+
+```text
+.runtime.txt
+```
+
+---
+
+## Model Artifact Handling
+
+The application loads model artifacts directly from the repository:
+
+```text
+models/champion.joblib
+models/feature_cols.json
+```
+
+These files are committed to GitHub and automatically loaded during deployment.
+
+---
+
+## Monitoring Plan
+
+Prediction monitoring is documented in:
+
+```text
+docs/monitoring.md
+```
+
+The monitoring plan includes:
+
+* Prediction log samples
+* Input monitoring
+* Retraining triggers
+* Model maintenance strategy
+
+Suggested retraining triggers:
+
+* Significant increase in prediction error
+* New sensor value ranges outside training distribution
+* Monthly model review
+* Collection of substantial new production data
+
+---
+
 ## Generated Reports
 
-The project automatically creates:
+The project automatically generates:
 
 * Correlation heatmap
 * Feature relationship plots
@@ -219,19 +289,20 @@ reports/
 
 ## Limitations
 
-* Predictions may be less reliable when sensor values fall outside the training range.
+* Predictions may be less reliable outside the training data range.
 * Seasonal effects are not explicitly modeled.
-* Additional environmental variables may improve prediction accuracy.
-* Performance depends on the quality of sensor measurements.
+* Additional environmental variables may improve performance.
+* Results depend on sensor quality and calibration.
 
 ---
 
 ## Reproducibility
 
-To reproduce the entire workflow:
+To reproduce the complete workflow:
 
 ```bash
 pip install -r requirements.txt
+
 python src/ingest_data.py
 python src/clean_data.py
 python src/features.py
