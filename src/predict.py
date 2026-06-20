@@ -4,8 +4,8 @@ import pandas as pd
 import streamlit as st
 from pathlib import Path
 
-MODEL_DIR = Path("models")
-
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+MODEL_DIR = PROJECT_ROOT / "models"
 
 @st.cache_resource
 def load_artifacts():
